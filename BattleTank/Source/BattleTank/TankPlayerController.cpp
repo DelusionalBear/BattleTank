@@ -33,12 +33,6 @@ void ATankPlayerController::AimTowardsCrosshair() const
 	if (TraceHitLocation(HitResult))
 	{
 		GetControlledTank()->AimAt(HitResult.Location);
-		/*
-		UE_LOG(LogTemp, Warning, TEXT("HitLocation: %s"), *HitResult.Location.ToString());
-		UE_LOG(LogTemp, Warning, TEXT("ImpactPoint: %s"), *HitResult.ImpactPoint.ToString());
-		UE_LOG(LogTemp, Warning, TEXT("Actor Hit: %s"), *HitResult.GetActor()->GetName());
-		*/
-
 	}
 	return;
 }
@@ -54,7 +48,6 @@ bool ATankPlayerController::TraceHitLocation(FHitResult& HitResult) const
 	
 	// get world space coordinates within FHitResult and return true. Returns false if no object has been hit.
 	// If we were looking at skybox for example.
-	FHitResult Hit;
 	if (GetHitResultAtScreenPosition(ScreenLocation, ECollisionChannel::ECC_Visibility, false, HitResult)) { return true; }
 	else { return false; }
 }
