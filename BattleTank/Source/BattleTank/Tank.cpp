@@ -15,7 +15,6 @@ ATank::ATank()
 
 	// No need to protect pointers as added at construction
 	TankAimingComponent = CreateDefaultSubobject<UTankAimingComponent>(FName("Aiming Component"));
-
 }
 
 // Called when the game starts or when spawned
@@ -40,6 +39,10 @@ void ATank::AimAt(FVector AimLocation)
 void ATank::Fire()
 {
 	if (!Barrel) { return; }
+	if (!ProjectileBlueprint) { return; }	// blueprint setup keep acting up, for some reason
+											// every once in a while it will be nullptr and crash
+											// now if tank doesn't fire, just check if it has
+											// projectile assigned in the Tank_BP
 
 	bool bIsReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
 

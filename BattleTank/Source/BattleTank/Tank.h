@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "TankAimingComponent.h"
+#include "TankMovementComponent.h"
 #include "Tank.generated.h"
 
 // Forward declarations
@@ -35,13 +36,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Setup)
 	void SetTurretReference(UTankTurret * TurretToSet);
 
-	UPROPERTY(EditAnywhere, Category = Setup)
+	UPROPERTY(EditDefaultsOnly, Category = Setup)
 	TSubclassOf<AProjectile> ProjectileBlueprint;
 
-	UPROPERTY(EditAnywhere, Category = Firing)
+	UPROPERTY(EditDefaultsOnly, Category = Firing)
 	float LaunchSpeed = 4000.0f;
 
-	UPROPERTY(EditAnywhere, Category = Firing)
+	UPROPERTY(EditDefaultsOnly, Category = Firing)
 	float ReloadTimeInSeconds = 3.0f;
 
 protected:
@@ -50,6 +51,9 @@ protected:
 
 	UTankAimingComponent *TankAimingComponent = nullptr;
 
+	UPROPERTY (BlueprintReadOnly)
+	UTankMovementComponent *TankMovementComponent = nullptr;
+
 private:
 	// local barrel reference for spawning projectile. OMFG.
 	// we could just have this one variable here as UStaticMesh component
@@ -57,7 +61,7 @@ private:
 	// we like. Instead he created another class that does absolutely NOTHING,
 	// other than having one single method.. and now this thing is still needed
 	// here for firing. This is so retarded...
-	UTankBarrel * Barrel = nullptr;
+	UTankBarrel *Barrel = nullptr;
 
 	double LastFireTime = 0;
 };
