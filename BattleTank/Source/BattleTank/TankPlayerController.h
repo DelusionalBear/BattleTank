@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Tank.h"
@@ -7,8 +5,11 @@
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
 
+// Forward declarations
+class UTankAimingComponent;
+
 /**
- * 
+ * Responsible for helping the player aim.
  */
 UCLASS()
 class BATTLETANK_API ATankPlayerController : public APlayerController
@@ -25,8 +26,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	float CrossHairYLocation = 0.33333f;
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Setup")
+	void FoundAimingComponent(UTankAimingComponent *AimCompRef);
+
 private:
-	ATank * GetControlledTank() const;
 	void AimTowardsCrosshair() const;
 	bool TraceHitLocation(FHitResult& HitResult) const;
 	
