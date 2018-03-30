@@ -5,7 +5,7 @@
 #include "TankAimingComponent.generated.h"
 
 UENUM()
-enum class EFiringStatus : uint8
+enum class EFiringState : uint8
 {
 	Reloading,
 	Aiming,
@@ -28,6 +28,10 @@ public:
 
 	virtual void BeginPlay() override;
 
+	bool IsBarrelMoving();
+
+	EFiringState GetFiringState() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Firing")
 	void Fire();
 
@@ -37,21 +41,28 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 	float LaunchSpeed = 4000.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Firing")
+	UPROPERTY(BlueprintReadWrite, Category = "Firing")
 	float ReloadTimeInSeconds = 3.0f;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	void Initialise(UTankTurret *TurretToSet, UTankBarrel *BarrelToSet);
 	void AimAt(FVector AimLocation);
 
+	UPROPERTY(BlueprintReadOnly, Category = "State")
+	int ShotsLeft = 5;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "State")
+	float LastFireTimeDelta = ReloadTimeInSeconds;
+
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "State")
-	EFiringStatus FiringState = EFiringStatus::Reloading;
+	EFiringState FiringState = EFiringState::Reloading;
 
 private:
 	UTankTurret *Turret = nullptr;
 	UTankBarrel *Barrel = nullptr;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-	void MoveBarrelTowards(FVector AimDirection);
+	void MoveBarrelTowards(FVector AimDir);
 	double LastFireTime = 0;
+	FVector AimDirection;
 };

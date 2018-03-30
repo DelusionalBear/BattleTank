@@ -17,26 +17,49 @@ void UTankAimingComponent::BeginPlay()
 	LastFireTime = FPlatformTime::Seconds();
 }
 
+bool UTankAimingComponent::IsBarrelMoving()
+{
+	if (!Barrel) { return false; }
+	return !(Barrel->GetForwardVector().Equals(AimDirection, 0.01f));
+}
+
+EFiringState UTankAimingComponent::GetFiringState() const
+{
+	return FiringState;
+}
+
 void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
 {
-	if (bool bIsReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds)
+	if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTimeInSeconds)
 	{
-		FiringState = EFiringStatus::Reloading;
+		LastFireTimeDelta = (float)(FPlatformTime::Seconds() - LastFireTime);
+		FiringState = EFiringState::Reloading;
+	}
+	else if (IsBarrelMoving())
+	{
+		FiringState = EFiringState::Aiming;
+	}
+	else
+	{
+		FiringState = EFiringState::Locked;
 	}
 }
 
 void UTankAimingComponent::Fire()
 {
-	if (FiringState != EFiringStatus::Reloading)
+	if (FiringState == EFiringState::Locked)
 	{
 		if (!Barrel) { return; }
 		if (!ProjectileBlueprint) { return; }
+		if (ShotsLeft < 1) { return; }
 		auto Projectile = GetWorld()->SpawnActor<AProjectile>(
 			ProjectileBlueprint,
 			Barrel->GetSocketLocation(FName("Projectile")),
 			Barrel->GetSocketRotation(FName("Projectile"))
 			);
 		Projectile->LaunchProjectile(LaunchSpeed);
+		ShotsLeft--;
+		LastFireTime = FPlatformTime::Seconds();
 	}
 }
 
@@ -67,16 +90,16 @@ void UTankAimingComponent::AimAt(FVector AimLocation)
 	);
 	if (bHaveAimSolution) 
 	{
-		MoveBarrelTowards(LaunchVelocity.GetSafeNormal());
-		auto Time = GetWorld()->GetTimeSeconds();
+		AimDirection = LaunchVelocity.GetSafeNormal();
+		MoveBarrelTowards(AimDirection);
 	}
 }
 
-void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
+void UTankAimingComponent::MoveBarrelTowards(FVector AimDir)
 {
 	if (!Barrel || !Turret) { return; }
 	auto BarrelRotator = Barrel->GetForwardVector().Rotation();
-	auto AimAsRotator = AimDirection.Rotation();
+	auto AimAsRotator = AimDir.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
 	if (DeltaRotator.Yaw >= 180.0f) { DeltaRotator.Yaw = DeltaRotator.Yaw - 360.0f; }
 	else if (DeltaRotator.Yaw <= -180.0f) { DeltaRotator.Yaw = DeltaRotator.Yaw + 360.0f; }
