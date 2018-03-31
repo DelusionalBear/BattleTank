@@ -10,10 +10,27 @@ void ATankPlayerController::BeginPlay()
 	if (AimingComponent) { FoundAimingComponent(AimingComponent); }
 }
 
+void ATankPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	if (InPawn)
+	{
+		auto PossessedTank = Cast<ATank>(InPawn);
+		if (!ensure(PossessedTank)) { return; }
+		// Subscribe our local method to the tank's death event
+		PossessedTank->OnDeath.AddUniqueDynamic(this, &ATankPlayerController::OnPlayerTankDeath);
+	}
+}
+
 void ATankPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	AimTowardsCrosshair();
+}
+
+void ATankPlayerController::OnPlayerTankDeath()
+{
+	StartSpectatingOnly();
 }
 
 void ATankPlayerController::AimTowardsCrosshair() const
@@ -41,6 +58,6 @@ bool ATankPlayerController::TraceHitLocation(FHitResult& HitResult) const
 	
 	// get world space coordinates within FHitResult and return true. Returns false if no object has been hit.
 	// If we were looking at skybox for example.
-	if (GetHitResultAtScreenPosition(ScreenLocation, ECollisionChannel::ECC_Visibility, false, HitResult)) { return true; }
+	if (GetHitResultAtScreenPosition(ScreenLocation, ECollisionChannel::ECC_Camera, false, HitResult)) { return true; }
 	else { return false; }
 }

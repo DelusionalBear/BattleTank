@@ -20,6 +20,9 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void OnPlayerTankDeath();
+
 	UPROPERTY(EditAnywhere)
 	float CrossHairXLocation = 0.5f;
 
@@ -31,7 +34,7 @@ protected:
 	void FoundAimingComponent(UTankAimingComponent *AimCompRef);
 
 private:
+	virtual void SetPawn(APawn* InPawn) override;
 	void AimTowardsCrosshair() const;
 	bool TraceHitLocation(FHitResult& HitResult) const;
-	
 };

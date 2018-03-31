@@ -18,11 +18,14 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void OnAITankDeath();
+
 protected:
 	// How close can AI tank get to the player
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float AcceptanceRadius = 8000.0f;
 
 private:
-	
+	virtual void SetPawn(APawn* InPawn) override;
 };

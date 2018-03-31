@@ -42,14 +42,14 @@ public:
 	float LaunchSpeed = 4000.0f;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Firing")
-	float ReloadTimeInSeconds = 3.0f;
+	float ReloadTimeInSeconds = 2.00f;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	void Initialise(UTankTurret *TurretToSet, UTankBarrel *BarrelToSet);
 	void AimAt(FVector AimLocation);
 
 	UPROPERTY(BlueprintReadOnly, Category = "State")
-	int ShotsLeft = 5;
+	int32 ShotsLeft = 20;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	float LastFireTimeDelta = ReloadTimeInSeconds;
